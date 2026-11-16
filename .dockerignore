@@ -1,0 +1,16 @@
+.git
+.gitignore
+.gitattributes
+Dockerfile*
+compose*.yaml
+compose*.yml
+env
+tools
+test
+deploy
+data
+*.md
+*.txt
+.env*
+node_modules
+

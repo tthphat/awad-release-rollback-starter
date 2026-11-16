@@ -6,7 +6,7 @@
   "description": "IA#4 starter: a small short-link service to package, release under load and roll back",
   "engines": { "node": ">=22.13" },
   "scripts": {
-    "start": "node src/migrate.js up && node src/server.js",
+    "start": "node src/server.js",
     "test": "node --test --test-reporter=spec \"test/**/*.test.js\"",
     "load": "node tools/load.js",
     "check": "node tools/check.js",

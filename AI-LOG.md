@@ -1,11 +1,11 @@
 # AI Log (CSC13114)
 
-Sinh viên: 23120319 — Trương Thành Phát
+Student: 23120319 — Trương Thành Phát
 
-## 2026-11-16 — IA#4: Đóng gói linkbox v1 theo tiêu chuẩn Production (Hand-over #1)
+## 2026-11-16 — IA#4: Production packaging for linkbox v1 (Hand-over #1)
 - **Tool**: Antigravity (Gemini 3.8 Flash).
 - **Asked for**: "Package linkbox as v1 image according to IA#4 requirements. Base image node:22-alpine, non-root user node, no secret baked in, only runtime files in image via .dockerignore, graceful shutdown on SIGTERM under 8s, config from environment, fail-fast on missing/dev-secret admin token in production without printing secret value, separate migration from start. Do not change anything under tools/ or in test/app.test.js. Ensure all 15 image checks I1-I15 pass."
-- **Kept**: (Đang cập nhật sau khi kiểm thử và nghiệm thu mã nguồn v1)
-- **Changed**: (Đang cập nhật sau khi kiểm thử và nghiệm thu mã nguồn v1)
-- **Rejected**: (Đang cập nhật sau khi kiểm thử và nghiệm thu mã nguồn v1)
-- **By hand**: Tự kiểm tra môi trường chạy Docker, Node.js v26, xác nhận fingerprint `4b56096c90ea819d`, gắn git tag `starter` trên commit gốc chưa qua chỉnh sửa của trường.
+- **Kept**: Updated `Dockerfile` with pinned base image `node:22-alpine` (I1, I2), non-root `USER node` (I3), baked `APP_VERSION` (I7), container `HEALTHCHECK` probing `/health` (I9), and exec-form `CMD ["node", "src/server.js"]` (I10); `.dockerignore` excluding unnecessary directories and files from `/app` (I5); `src/server.js` handling `SIGTERM` gracefully closing idle and in-flight connections within 1.6s (I10); `package.json` decoupling migrations from `npm start` (I15). Running `npm run check -- image --new=linkbox:v1` passed all 15/15 checks.
+- **Changed**: Requested the assistant to add descriptive inline comments for each corresponding check ID (`I1` through `I10`) in `Dockerfile`, and thoroughly document the Docker volume permission mechanism for user `node` in `RUN mkdir -p /data && chown -R node:node /data` (I6).
+- **Rejected**: In the initial proposal for `src/config.js`, when checking `adminToken === 'dev-secret'` in production, the assistant suggested logging: `console.error('Invalid ADMIN_TOKEN: cannot use dev-secret')`. I rejected this error message because the verification logic for check `I14` in `tools/check.js` uses `const leaks = /dev-secret/.test(said);` to detect secret leakage. Printing the literal string `'dev-secret'` would cause `leaks` to evaluate to true and fail check `I14`. I required modifying the message to: `console.error('Error: ADMIN_TOKEN cannot use default development secret in production')` to ensure `I14` passes cleanly without leaking secret values.
+- **By hand**: Manually executed `docker build --build-arg APP_VERSION=1.0.0 -t linkbox:v1 .` and verified `npm run check -- image --new=linkbox:v1` in PowerShell, confirming 15/15 passed; staged and committed the packaging changes separately, then tagged `v1`.
